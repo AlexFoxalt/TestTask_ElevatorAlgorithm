@@ -262,9 +262,9 @@ class Elevator:
             if self.cabin:
                 # So if Elevator already moves somewhere with persons, let's take only guys, with same direction target
                 if self.go_up:
-                    persons_to_enter = [prs for prs in current_personset if prs.go_up][:empty_slots]
+                    persons_to_enter = [prs for prs in current_personset if prs.go_up]
                 elif self.go_down:
-                    persons_to_enter = [prs for prs in current_personset if prs.go_down][:empty_slots]
+                    persons_to_enter = [prs for prs in current_personset if prs.go_down]
                 else:
                     logging.error("Somehow Elevator has no direction, so it can't decide who should enter")
                     raise ElevatorError()
@@ -284,25 +284,24 @@ class Elevator:
                 # Here the situation is reversed
                 elif self.current == 1:
                     persons_to_enter = majority_up
-
-                # If there is no majority, let the first guy in queue decide where we go
-                if majority_up_size == majority_down_size:
-                    if current_personset[0].go_up:
-                        persons_to_enter = majority_up
-                    else:
-                        persons_to_enter = majority_down
-
-                # Default cases, where majority is possible to calculate
-                elif majority_up_size > majority_down_size:
-                    persons_to_enter = majority_up
-                elif majority_up_size < majority_down_size:
-                    persons_to_enter = majority_down
                 else:
-                    logging.error("Somehow Elevator can't calculate majority on the floor")
-                    raise ElevatorError()
+                    # If there is no majority, let the first guy in queue decide where we go
+                    if majority_up_size == majority_down_size:
+                        if current_personset[0].go_up:
+                            persons_to_enter = majority_up
+                        else:
+                            persons_to_enter = majority_down
+                    # Default cases, where majority is possible to calculate
+                    elif majority_up_size > majority_down_size:
+                        persons_to_enter = majority_up
+                    elif majority_up_size < majority_down_size:
+                        persons_to_enter = majority_down
+                    else:
+                        logging.error("Somehow Elevator can't calculate majority on the floor")
+                        raise ElevatorError()
 
-                # Lets fill cabin to the max.value, and no more!
-                persons_to_enter = persons_to_enter[:empty_slots]
+            # Lets fill cabin to the max.value, and no more!
+            persons_to_enter = persons_to_enter[:empty_slots]
 
             # Update cabin
             self.cabin.extend(persons_to_enter)
